@@ -3,7 +3,7 @@ import './Header.css';
 export default function Header() {
   return (
     <header>
-      <div className="header-section">
+      {/* <div className="header-section">
         <img src="/images/logo.svg" alt="Daily logo" />
         <span className="title">Custom video application demo with Daily React</span>
       </div>
@@ -23,7 +23,7 @@ export default function Header() {
           rel="noreferrer">
           <img src="/images/github.svg" alt="Github" />
         </a>
-      </div>
+      </div> */}
     </header>
   );
 }

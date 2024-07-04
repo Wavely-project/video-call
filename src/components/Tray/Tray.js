@@ -47,7 +47,7 @@ export default function Tray({ leaveCall }) {
       if (!showChat) {
         setNewChatMessage(true);
       }
-    }, [showChat])
+    }, [showChat]),
   });
 
   const toggleVideo = useCallback(() => {
@@ -58,7 +58,7 @@ export default function Tray({ leaveCall }) {
     callObject.setLocalAudio(mutedAudio);
   }, [callObject, mutedAudio]);
 
-  const toggleScreenShare = () => isSharingScreen ? stopScreenShare() : startScreenShare();
+  const toggleScreenShare = () => (isSharingScreen ? stopScreenShare() : startScreenShare());
 
   const toggleMeetingInformation = () => {
     setShowMeetingInformation(!showMeetingInformation);

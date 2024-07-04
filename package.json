@@ -5,10 +5,17 @@
   "dependencies": {
     "@daily-co/daily-js": "^0.54.0",
     "@daily-co/daily-react": "^0.16.0",
+    "@mediapipe/tasks-vision": "^0.10.14",
+    "@types/recordrtc": "^5.6.14",
+    "i": "^0.3.7",
+    "npm": "^10.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
-    "recoil": "^0.7.7"
+    "react-speech-recognition": "^3.10.0",
+    "recoil": "^0.7.7",
+    "recordrtc": "^5.6.2",
+    "socket.io-client": "^4.7.5"
   },
   "devDependencies": {
     "eslint": "^8.45.0",
@@ -19,7 +26,8 @@
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react": "^7.33.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.0",
+    "tailwindcss": "^3.4.4"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import './App.css';
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -62,9 +63,12 @@ export default function App() {
    * Once we pass the hair check, we can actually join the call.
    * We'll pass the username entered during Haircheck to .join().
    */
-  const joinCall = useCallback((userName) => {
-    callObject.join({ url: roomUrl, userName });
-  }, [callObject, roomUrl]);
+  const joinCall = useCallback(
+    (userName) => {
+      callObject.join({ url: roomUrl, userName });
+    },
+    [callObject, roomUrl],
+  );
 
   /**
    * Start leaving the current call.
@@ -208,7 +212,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <Header />
+      {/* <Header /> */}
       {renderApp()}
     </div>
   );
