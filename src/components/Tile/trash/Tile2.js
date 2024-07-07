@@ -15,7 +15,7 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 
 // eslint-disable-next-line camelcase
 import hand_landmarker_task from '../../hand_landmarker.task';
-import Username from '../Username/Username';
+import Username from '../../Username/Username';
 
 const socket = io.connect('http://localhost:3005');
 

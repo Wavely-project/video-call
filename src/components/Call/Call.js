@@ -130,7 +130,7 @@ export default function Call() {
         {remoteParticipantIds.length > 0 || screens.length > 0 ? (
           <>
             {remoteParticipantIds.map((id) => (
-              <Tile key={id} id={id} />
+              <Tile key={id} id={id} isDeaf={isDeaf} />
             ))}
             {screens.map((screen) => (
               <Tile key={screen.screenId} id={screen.session_id} isScreenShare />

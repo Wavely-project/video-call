@@ -15,7 +15,7 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 
 // eslint-disable-next-line camelcase
 import hand_landmarker_task from '../../hand_landmarker.task';
-import Username from '../Username/Username';
+import Username from '../../Username/Username';
 
 const socket = io.connect('http://localhost:3005');
 
@@ -81,54 +81,29 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
 
   const sendMessage = (message) => {
     console.log('sendMessage socket', message, roomId);
-    const fromType = isDeaf === 'yes' ? 'deaf' : 'notDeaf';
-    socket.emit('message', { message, roomId, id, fromType });
+    socket.emit('message', { message, roomId, id });
   };
-
-  const [textTobeSign, setTextTobeSign] = useState([]);
-  const [textSom, setTextntText] = useState(false);
-
-  const [deafState, setIsDeafState] = useState('inknow');
-
-  useEffect(() => {
-    if (textSom === false || isDeaf === 'yes' || isDeaf === 'no') {
-      setIsDeafState(isDeaf);
-      setIsDeafState((prev) => isDeaf);
-      setTextntText(true);
-    }
-  }, [isDeaf]);
 
   useEffect(() => {
     socket.on('message', (message) => {
-      console.log('message ', message);
+      console.log('message reccc', message.message, message.id, id);
+      if (message.id !== id) {
+        // Don't understand why this is not working as expected
+        console.log('returning same user');
+        return;
+      }
+      if (message.id === id) {
+        console.log('returning the other user!!!!!!!!! user');
 
-      if (deafState === 'yes' && message.fromType === 'notDeaf') {
-        console.log('message added on deaf', deafState === 'yes' && message.fromType === 'notDeaf');
-        setTextTobeSign((prevMessages) => [...prevMessages, message.message]);
         setMessageReceived((prevMessages) => [...prevMessages, message.message]);
       }
-      if (deafState === 'no' && message.fromType === 'deaf') {
-        console.log('message added on notDeaf', deafState === 'no' && message.fromType === 'deaf');
-
-        setMessageReceived((prevMessages) => [...prevMessages, message.message]);
-      }
-      // if (message.id !== id) {
-      //   // Don't understand why this is not working as expected
-      //   console.log('returning same user');
-      //   return;
-      // }
-      // if (message.id === id) {
-      //   console.log('returning the other user!!!!!!!!! user');
-
-      //   setMessageReceived((prevMessages) => [...prevMessages, message.message]);
-      // }
 
       // setTextTobeSign((prevMessages) => [...prevMessages, message.message]);
     });
     return () => {
       socket.off('message');
     };
-  }, [deafState]);
+  }, []);
 
   let containerCssClasses = isScreenShare ? 'tile-screenshare' : 'tile-video';
   // const mediaTrack = useMediaTrack(id, "video");
@@ -193,7 +168,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
 
       if (recorderRef.current.getBlob()) {
         // console.log('checkHandPresence', handsTimestamps);
-        // console.log('checkHandPresence', checkHandPresence(handsTimestampsRef.current));
+        console.log('checkHandPresence', checkHandPresence(handsTimestampsRef.current));
         if (checkHandPresence(handsTimestampsRef.current)) {
           setblobsx((blobsx) => {
             const updatedBlobs = [...blobsx, recorderRef.current.getBlob()];
@@ -213,9 +188,9 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
     await new Promise((resolve) => setTimeout(resolve, 3000));
     await handleStop();
 
-    // console.log('blobsx inside recored', blobsx);
+    console.log('blobsx inside recored', blobsx);
     if (blobsx && blobsx.length === 5) {
-      // console.log('blobsx end');
+      console.log('blobsx end');
       return;
     }
 
@@ -224,11 +199,11 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
 
   const sendBlobsToServer = useCallback(
     async (bolb) => {
-      // console.log('isDeaf', isDeaf, 'Seding to the server !!!');
+      console.log('isDeaf', isDeaf, 'Seding to the server !!!');
       if (isDeaf !== 'yes') {
         return;
       }
-      // console.log('Sending blobs to server', bolb);
+      console.log('Sending blobs to server', bolb);
       const formData = new FormData();
       const blob = new Blob([bolb], { type: 'video/webm' });
       formData.append('videofile', blob, `recorded-${blob.size}.webm`);
@@ -240,7 +215,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
       const data = await response.json();
 
       if (data) {
-        // console.log('Data sent from the server', data?.prediction?.[0]);
+        console.log('Data sent from the server', data?.prediction?.[0]);
         sendMessage(data?.prediction?.[0]);
         setNumberOfDones((numberOfdones) => numberOfdones + 1);
         setblobsx((blobsx) => {
@@ -284,10 +259,6 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
 
-  useEffect(() => {
-    console.log('transcript', transcript);
-  }, [transcript]);
-
   const [transcriptTosend, setTransTouse] = useState('');
   useEffect(() => {
     if (interimTranscript !== '') {
@@ -296,14 +267,8 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
   }, [interimTranscript]);
 
   useEffect(() => {
-    console.log('finalTranscript', finalTranscript);
     if (interimTranscript === '') {
-      console.log('interimTranscript', interimTranscript);
-      console.log('transcriptTosend', transcriptTosend);
-
-      if (isLocal) {
-        sendMessage(transcriptTosend);
-      }
+      sendMessage(transcriptTosend);
 
       setTransTouse('');
     }
@@ -314,32 +279,22 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
   }
 
   useEffect(() => {
-    console.log(transcript, transcript);
+    console.log(transcript);
   }, [transcript]);
 
   useEffect(() => {
-    // console.log('isDeaf', isDeaf);
+    console.log('isDeaf', isDeaf);
     if (isDeaf === 'yes') {
       record();
-      // console.log('Recording started');
+      console.log('Recording started');
     }
-    console.log('check recording', isDeaf === 'no' && !mutedAudio);
-
     if (isDeaf === 'no' && !mutedAudio) {
-      console.log('Recording sound started xx', isDeaf === 'no' && !mutedAudio);
-      // console.log('Recording sound started xx');
-      console.log('listening before', listening);
-
+      console.log('Recording sound started xx');
       SpeechRecognition.startListening({
         continuous: true,
       });
-      console.log('listening after', listening);
     }
   }, [isDeaf]);
-
-  useEffect(() => {
-    console.log('listening in useeffect', listening);
-  }, [listening]);
 
   useEffect(() => {
     if (isDeaf === 'no') {
@@ -454,96 +409,26 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
   //     storeHandPresence();
   //   }
   // }, [isDeaf]);
-  const [videoUrls, setVideoUrls] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const texttosign = async (text) => {
-    if (!isLocal) {
-      return;
-    }
-    // e.preventDefault();
-
-    const formData = new FormData();
-    formData.append('sentence', text);
-
-    try {
-      const response = await fetch('http://127.0.0.1:5000/process_sentence', {
-        method: 'POST',
-        body: formData,
-      });
-      if (!response.ok) throw new Error('Video not found');
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      setVideoUrls((prevState) => [...prevState, url]);
-    } catch (error) {
-      console.error('Error fetching video:', error);
-    }
-  };
-
-  useEffect(() => {
-    // textTobeSign
-    if (isDeaf === 'yes') {
-      console.log('textTobeSign before', textTobeSign);
-      if (textTobeSign.length > 0) {
-        const text = textTobeSign[0];
-        texttosign(text);
-        setTextTobeSign((prevMessages) => prevMessages.slice(1));
-        console.log('textTobeSign after', textTobeSign);
-      }
-    }
-  }, [textTobeSign]);
-
-  const handleVideoEnd = () => {
-    if (videoUrls.length === 0) return;
-    // Remove the current video URL from the array
-    setVideoUrls((prevState) => prevState.filter((_, index) => index !== currentIndex));
-    // Automatically move to the next video, or reset if at the end of the array
-    setCurrentIndex((prevState) => {
-      if (prevState < videoUrls.length - 1) {
-        return prevState + 1;
-      }
-      return 0;
-    });
-  };
 
   return (
-    <>
-      <div className={containerCssClasses}>
-        {/* <h1>Is there a Hand? {handPresence ? 'Yes' : 'No'}</h1>
+    <div className={containerCssClasses}>
+      {/* <h1>Is there a Hand? {handPresence ? 'Yes' : 'No'}</h1>
       <h1>Is there a Hand? {handPresence ? 'Yes' : 'No'}</h1> */}
 
-        <DailyVideo
-          ref={videoRef}
-          automirror
-          sessionId={id}
-          type={isScreenShare ? 'screenVideo' : 'video'}
-        />
-        <canvas
-          ref={canvasRef}
-          style={{ backgroundColor: 'black', width: '600px', height: '480px', display: 'none' }}
-        />
-        <div className=" absolute w-10/12 transpciptWrapper">
-          {!isLocal && <div className="transpcipt">{messageReceived.join(' ')}</div>}
-        </div>
-        {!isScreenShare && <Username id={id} isLocal={isLocal} />}
-        {/* <button type="button" onClick={texttosign}>
-        Send video
-      </button> */}
+      <DailyVideo
+        ref={videoRef}
+        automirror
+        sessionId={id}
+        type={isScreenShare ? 'screenVideo' : 'video'}
+      />
+      <canvas
+        ref={canvasRef}
+        style={{ backgroundColor: 'black', width: '600px', height: '480px', display: 'none' }}
+      />
+      <div className=" absolute w-10/12 transpciptWrapper">
+        {!isLocal && <div className="transpcipt">{messageReceived.join(' ')}</div>}
       </div>
-
-      {isLocal && (
-        <div className=" w-full max-h-auto max-w-[480px] bg-black h-[360px]">
-          {videoUrls.length > 0 && (
-            <video
-              className=" w-full h-auto"
-              src={videoUrls[currentIndex]}
-              onEnded={handleVideoEnd}
-              key={currentIndex} // Key helps React identify video changes
-              autoPlay
-            />
-          )}
-        </div>
-      )}
-    </>
+      {!isScreenShare && <Username id={id} isLocal={isLocal} />}
+    </div>
   );
 }
