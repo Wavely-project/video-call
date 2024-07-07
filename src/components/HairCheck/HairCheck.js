@@ -68,6 +68,7 @@ export default function HairCheck({ joinCall, cancelCall }) {
   ) : (
     <form className="hair-check mt-7" onSubmit={handleJoin}>
       <h1>Setup your hardware</h1>
+
       {/* Video preview */}
       {localSessionId && <DailyVideo sessionId={localSessionId} mirror />}
 

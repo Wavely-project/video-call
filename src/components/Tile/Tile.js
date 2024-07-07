@@ -27,6 +27,28 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
   const [roomId, setRoomId] = useState(null);
   const [messageReceived, setMessageReceived] = useState([]);
 
+  const scrambleWords = async (x) => {
+    try {
+      // Assuming your Express server is running on localhost:3000
+      const wordsQueryParam = x.join(',');
+
+      const response = await fetch(
+        `http://localhost:3005/scrambled-sentence?words=${encodeURIComponent(wordsQueryParam)}`,
+        {
+          method: 'GET', // Optional: Explicitly specifying the method for clarity
+        },
+      );
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      console.log('Scrambled words:', data, data.sentence);
+      return data.sentence;
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+    }
+  };
+
   const removeWords = () => {
     setMessageReceived((prevTranscript) => {
       const wordCount = prevTranscript.length;
@@ -50,7 +72,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
       if (messageReceived.length > 0) {
         removeWords();
       }
-    }, 6000); // Check and remove words every 6 seconds
+    }, 10000); // Check and remove words every 6 seconds
 
     return () => clearInterval(interval); // Cleanup the interval on component unmount
   }, [messageReceived]);
@@ -98,6 +120,25 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
     }
   }, [isDeaf]);
 
+  const [predectedText, setPredectedText] = useState([]);
+
+  useEffect(() => {
+    console.log('predectedText', predectedText);
+    const smtmt = async () => {
+      if (predectedText.length === 3) {
+        const x = await scrambleWords(predectedText);
+        console.log('scrambleWords', x);
+
+        setMessageReceived((prevTranscript) => [...prevTranscript.slice(0, -3), x]);
+        setPredectedText((prevTexts) => prevTexts.slice(3));
+      }
+    };
+    smtmt();
+  }, [predectedText]);
+
+  useEffect(() => {
+    console.log('messageReceived', messageReceived);
+  }, [messageReceived]);
   useEffect(() => {
     socket.on('message', (message) => {
       console.log('message ', message);
@@ -109,8 +150,11 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
       }
       if (deafState === 'no' && message.fromType === 'deaf') {
         console.log('message added on notDeaf', deafState === 'no' && message.fromType === 'deaf');
+        if (message.message !== undefined) {
+          setPredectedText((prevMessages) => [...prevMessages, message.message]);
 
-        setMessageReceived((prevMessages) => [...prevMessages, message.message]);
+          setMessageReceived((prevMessages) => [...prevMessages, message.message]);
+        }
       }
       // if (message.id !== id) {
       //   // Don't understand why this is not working as expected
