@@ -277,6 +277,12 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
       const blob = new Blob([bolb], { type: 'video/webm' });
       formData.append('videofile', blob, `recorded-${blob.size}.webm`);
 
+      setNumberOfDones((numberOfdones) => numberOfdones + 1);
+      setblobsx((blobsx) => {
+        const updatedBlobs = blobsx.slice(1);
+        return updatedBlobs;
+      });
+
       const response = await fetch('http://192.168.1.3:3006/', {
         method: 'POST',
         body: formData,
@@ -286,11 +292,6 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
       if (data) {
         // console.log('Data sent from the server', data?.prediction?.[0]);
         sendMessage(data?.prediction?.[0]);
-        setNumberOfDones((numberOfdones) => numberOfdones + 1);
-        setblobsx((blobsx) => {
-          const updatedBlobs = blobsx.slice(1);
-          return updatedBlobs;
-        });
       }
     },
     [isDeaf],
@@ -363,13 +364,13 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
 
   useEffect(() => {
     // console.log('isDeaf', isDeaf);
-    if (isDeaf === 'yes') {
+    if (isDeaf === 'yes' && isLocal) {
       record();
       // console.log('Recording started');
     }
     console.log('check recording', isDeaf === 'no' && !mutedAudio);
 
-    if (isDeaf === 'no' && !mutedAudio) {
+    if (isDeaf === 'no' && !mutedAudio && isLocal) {
       console.log('Recording sound started xx', isDeaf === 'no' && !mutedAudio);
       // console.log('Recording sound started xx');
       console.log('listening before', listening);
@@ -387,9 +388,9 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
 
   useEffect(() => {
     if (isDeaf === 'no') {
-      if (mutedAudio) {
+      if (mutedAudio && isLocal) {
         SpeechRecognition.stopListening();
-      } else if (!mutedAudio) {
+      } else if (!mutedAudio && isLocal) {
         SpeechRecognition.startListening({
           continuous: true,
         });
@@ -575,7 +576,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
       </button> */}
       </div>
 
-      {isLocal && (
+      {isLocal && isDeaf === 'yes' && (
         <div className=" w-full max-h-auto max-w-[480px] bg-black h-[360px]">
           {videoUrls.length > 0 && (
             <video
