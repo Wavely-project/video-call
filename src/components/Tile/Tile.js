@@ -283,7 +283,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
         return updatedBlobs;
       });
 
-      const response = await fetch('http://192.168.1.3:3006/', {
+      const response = await fetch('http://127.0.0.1:3006/', {
         method: 'POST',
         body: formData,
       });
