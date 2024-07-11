@@ -23,7 +23,7 @@ async function createRoom() {
   const headers = isLocal && {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.REACT_APP_DAILY_API_KEY}`,
+      Authorization: `Bearer 1d29e0ccc5c3ed627d1bd3c8aef6e1de3d1e389f65d079907f157e113a849500`,
     },
   };
 

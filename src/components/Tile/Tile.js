@@ -17,7 +17,7 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 import hand_landmarker_task from '../../hand_landmarker.task';
 import Username from '../Username/Username';
 
-const socket = io.connect('http://localhost:3005');
+const socket = io.connect('https://192.168.1.129:3005');
 
 export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
   const videoState = useVideoTrack(id);
@@ -33,7 +33,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
       const wordsQueryParam = x.join(',');
 
       const response = await fetch(
-        `http://localhost:3005/scrambled-sentence?words=${encodeURIComponent(wordsQueryParam)}`,
+        `http://127.0.0.1:3005/scrambled-sentence?words=${encodeURIComponent(wordsQueryParam)}`,
         {
           method: 'GET', // Optional: Explicitly specifying the method for clarity
         },
@@ -283,7 +283,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
         return updatedBlobs;
       });
 
-      const response = await fetch('http://127.0.0.1:3006/', {
+      const response = await fetch('http://192.168.1.129:3006/', {
         method: 'POST',
         body: formData,
       });
@@ -291,7 +291,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
 
       if (data) {
         // console.log('Data sent from the server', data?.prediction?.[0]);
-        sendMessage(data?.prediction?.[0]);
+        sendMessage(data?.prediction);
       }
     },
     [isDeaf],
@@ -512,7 +512,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone, isDeaf }) {
     formData.append('sentence', text);
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/process_sentence', {
+      const response = await fetch('http://192.168.1.129:5001/process_sentence', {
         method: 'POST',
         body: formData,
       });
